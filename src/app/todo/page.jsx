@@ -45,7 +45,7 @@ function Todo() {
 
   const getTodo = async (accessToken) => {
     try {
-      const response = await fetch(`${config.backendUrl}api/tasks/`, {
+      const response = await fetch(`${config.backendUrl}/api/tasks/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`, // Ensure to replace with your actual token
@@ -75,7 +75,7 @@ function Todo() {
     };
 
     try {
-      const response = await fetch(`${config.backendUrl}api/tasks/`, {
+      const response = await fetch(`${config.backendUrl}/api/tasks/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${jwt}`, // Replace with your actual token
@@ -120,7 +120,7 @@ function Todo() {
     };
   
     try {
-      const response = await fetch(`${config.backendUrl}api/tasks/${editingId}/`, {
+      const response = await fetch(`${config.backendUrl}/api/tasks/${editingId}/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${jwt}`,
@@ -145,7 +145,7 @@ function Todo() {
 
   const deleteTodo = async (id) => {
     try {
-      const response = await fetch(`${config.backendUrl}api/tasks/${id}/`, {
+      const response = await fetch(`${config.backendUrl}/api/tasks/${id}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${jwt}`,},
