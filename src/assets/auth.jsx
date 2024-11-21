@@ -27,9 +27,8 @@ import * as z from "zod";
 import config from "@/config";
 import { AuthContext } from "@/Context/authContext";
 import { jwtDecode } from "jwt-decode";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 import { useContext } from "react";
-
 
 // Login Validation Schema
 const loginSchema = z.object({
@@ -54,17 +53,10 @@ const signupSchema = z.object({
   }),
 });
 
-
-const decode=async (token)=>{
-const decodedToken= await jwt_decode(token)
-return decodedToken
-}
-
 export default function AuthPage() {
-
-    const router = useRouter();
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const {jwt,setJwt}=useContext(AuthContext)
+  const { jwt, setJwt } = useContext(AuthContext);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -76,7 +68,7 @@ export default function AuthPage() {
 
         const currentTime = Date.now() / 1000; // in seconds
 
-        console.log(decodedToken)
+        console.log(decodedToken);
 
         if (decodedToken.exp < currentTime) {
           console.log("Token expired, attempting to refresh...");
@@ -94,7 +86,7 @@ export default function AuthPage() {
                 if (data.access && data.refresh) {
                   // Store the new tokens in localStorage
                   localStorage.setItem("accessToken", data.access);
-                  setJwt(data.access)
+                  setJwt(data.access);
                   localStorage.setItem("refreshToken", data.refresh);
                 } else {
                   console.error("Failed to refresh tokens");
@@ -105,8 +97,8 @@ export default function AuthPage() {
               });
           }
         } else {
-            setJwt(accessToken)
-            router.push('/todo');
+          setJwt(accessToken);
+          router.push("/todo");
         }
       } catch (error) {
         console.error("Failed to decode token:", error);
@@ -163,7 +155,7 @@ export default function AuthPage() {
       localStorage.setItem("accessToken", data.access);
       localStorage.setItem("refreshToken", data.refresh);
 
-      alert("Login successful!");
+      router.push("/todo");
     } catch (error) {
       console.error("Login failed:", error);
       alert("Login failed. Please try again.");
