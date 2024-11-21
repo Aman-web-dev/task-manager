@@ -1,8 +1,9 @@
 import Image from "next/image";
-import Todo from "./components/todo";
+
+import SignupPage from "@/assets/auth";
 
 export default function Home() {
   return (
-<Todo/>
+<SignupPage/>
   );
 }
