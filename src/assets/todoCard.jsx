@@ -5,92 +5,98 @@ import { Clock, CheckCircle2, XCircle, Edit2, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 function TodoCard({ todoItem, startEditing, deleteTodo }) {
-  // Map status to badge colors and icons
   const statusConfig = {
     Completed: { 
-      color: "green", 
-      icon: <CheckCircle2 className="w-4 h-4 mr-2" />,
-      text: "text-green-700" 
+      color: "bg-green-100 text-green-700 border-green-200", 
+      icon: <CheckCircle2 className="w-4 h-4" />,
     },
     Pending: { 
-      color: "yellow", 
-      icon: <Clock className="w-4 h-4 mr-2" />,
-      text: "text-yellow-700" 
+      color: "bg-yellow-100 text-yellow-700 border-yellow-200", 
+      icon: <Clock className="w-4 h-4" />,
     },
     Skipped: { 
-      color: "red", 
-      icon: <XCircle className="w-4 h-4 mr-2" />,
-      text: "text-red-700" 
+      color: "bg-red-100 text-red-700 border-red-200", 
+      icon: <XCircle className="w-4 h-4" />,
     },
   };
 
   const status = todoItem.status || "Pending";
   const currentStatus = statusConfig[status] || statusConfig.Pending;
+  
+  // Format the date to be more readable
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric'
+    });
+  };
 
   return (
-    <Card className="w-full hover:shadow-lg transition-shadow duration-300 relative group">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start">
-          <div className="space-y-2 flex-grow">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800">
-                {todoItem.title}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">
-                {todoItem.description}
-              </p>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <span className="text-sm font-medium mr-2">Status:</span>
-                <Badge 
-                  variant="outline" 
-                  className={`${currentStatus.text} border-${currentStatus.color}-300 bg-${currentStatus.color}-50`}
-                >
-                  {currentStatus.icon}
-                  {status}
-                </Badge>
-              </div>
-              
-              <div className="text-sm text-gray-500">
-                <span className="font-medium">Due:</span> {todoItem.due_on}
-              </div>
-            </div>
+    <Card className="w-full overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200">
+      <CardContent className="p-6">
+        {/* Status Badge - Top Right */}
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex-grow pr-4 line-clamp-1">
+            {todoItem.title}
+          </h3>
+          <Badge 
+            variant="outline" 
+            className={`${currentStatus.color} flex items-center gap-1.5 px-2.5 py-1 rounded-full`}
+          >
+            {currentStatus.icon}
+            {status}
+          </Badge>
+        </div>
+
+        {/* Description */}
+        <p className="text-gray-600 mb-4 line-clamp-2 min-h-[3rem]">
+          {todoItem.description || "No description provided"}
+        </p>
+
+        {/* Bottom Section */}
+        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+          {/* Due Date */}
+          <div className="flex items-center">
+            <Clock className="w-4 h-4 text-gray-400 mr-2" />
+            <span className="text-sm text-gray-500">
+              Due: {formatDate(todoItem.due_on)}
+            </span>
           </div>
-          
-          {/* Action Icons */}
-          <div className="flex items-center space-x-2">
-            <TooltipProvider>
+
+          {/* Action Buttons */}
+          <TooltipProvider>
+            <div className="flex gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div 
+                  <button
                     onClick={() => startEditing(todoItem)}
-                    className="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition-colors"
+                    className="p-2 hover:bg-blue-50 rounded-full transition-colors duration-200"
                   >
-                    <Edit2 className="w-5 h-5 text-gray-600 hover:text-blue-500" />
-                  </div>
+                    <Edit2 className="w-4 h-4 text-blue-600" />
+                  </button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Edit Todo</p>
                 </TooltipContent>
               </Tooltip>
-              
+
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div 
+                  <button
                     onClick={() => deleteTodo(todoItem.id)}
-                    className="p-2 hover:bg-red-50 rounded-full cursor-pointer transition-colors"
+                    className="p-2 hover:bg-red-50 rounded-full transition-colors duration-200"
                   >
-                    <Trash2 className="w-5 h-5 text-gray-600 hover:text-red-500" />
-                  </div>
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Delete Todo</p>
                 </TooltipContent>
               </Tooltip>
-            </TooltipProvider>
-          </div>
+            </div>
+          </TooltipProvider>
         </div>
       </CardContent>
     </Card>

@@ -26,7 +26,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import config from "@/config";
 import { AuthContext } from "@/Context/authContext";
-import { jwtDecode } from "jwt-decode";
+
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 
@@ -55,58 +55,7 @@ const signupSchema = z.object({
 
 export default function AuthPage() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { jwt, setJwt } = useContext(AuthContext);
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (accessToken) {
-      try {
-        const decodedToken = jwtDecode(accessToken);
-
-        const currentTime = Date.now() / 1000; // in seconds
-
-        console.log(decodedToken);
-
-        if (decodedToken.exp < currentTime) {
-          console.log("Token expired, attempting to refresh...");
-
-          if (refreshToken) {
-            fetch(`${config.backendUrl}/auth/token/refresh/`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ refresh: refreshToken }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.access && data.refresh) {
-                  // Store the new tokens in localStorage
-                  localStorage.setItem("accessToken", data.access);
-                  setJwt(data.access);
-                  localStorage.setItem("refreshToken", data.refresh);
-                } else {
-                  console.error("Failed to refresh tokens");
-                }
-              })
-              .catch((error) => {
-                console.error("Error refreshing token:", error);
-              });
-          }
-        } else {
-          setJwt(accessToken);
-          router.push("/todo");
-        }
-      } catch (error) {
-        console.error("Failed to decode token:", error);
-      }
-    } else {
-      console.log("No access token found.");
-    }
-  }, []);
+  const { handleLogin, handleSignup, isSubmitting } = useContext(AuthContext);
 
   // Login Form
   const loginForm = useForm({
@@ -127,75 +76,9 @@ export default function AuthPage() {
     },
   });
 
-  // Handle Login Submission
-  const onLoginSubmit = async (values) => {
-    setIsSubmitting(true);
-    try {
-      console.log("Login Values:", values);
 
-      // Make a POST request to the backend
-      const response = await fetch(`${config.backendUrl}/auth/login/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values), // Convert form values to JSON
-      });
 
-      if (!response.ok) {
-        // Handle non-successful responses
-        const errorData = await response.json();
-        throw new Error(errorData?.message || "Login failed");
-      }
-
-      const data = await response.json(); // Parse the response JSON
-      console.log("Login successful:", data);
-
-      // Save the tokens in localStorage
-      localStorage.setItem("accessToken", data.access);
-      localStorage.setItem("refreshToken", data.refresh);
-
-      router.push("/todo");
-    } catch (error) {
-      console.error("Login failed:", error);
-      alert("Login failed. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Handle Signup Submission
-  const onSignupSubmit = async (values) => {
-    setIsSubmitting(true);
-    try {
-      console.log("Signup Values:", values);
-
-      // Make a POST request to the backend
-      const response = await fetch(`${config.backendUrl}/auth/register/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values), // Convert the form values to JSON
-      });
-
-      if (!response.ok) {
-        // Handle non-successful responses
-        const errorData = await response.json();
-        throw new Error(errorData?.message || "Signup failed");
-      }
-
-      const data = await response.json(); // Parse the response JSON
-      console.log("Signup successful:", data);
-
-      alert("Signup successful!");
-    } catch (error) {
-      console.error("Signup failed:", error);
-      alert("Signup failed. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+ 
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
@@ -215,7 +98,7 @@ export default function AuthPage() {
             <TabsContent value="login">
               <Form {...loginForm}>
                 <form
-                  onSubmit={loginForm.handleSubmit(onLoginSubmit)}
+                  onSubmit={loginForm.handleSubmit(handleLogin)}
                   className="space-y-4"
                 >
                   <FormField
@@ -265,7 +148,7 @@ export default function AuthPage() {
             <TabsContent value="signup">
               <Form {...signupForm}>
                 <form
-                  onSubmit={signupForm.handleSubmit(onSignupSubmit)}
+                  onSubmit={signupForm.handleSubmit(handleSignup)}
                   className="space-y-4"
                 >
                   <FormField

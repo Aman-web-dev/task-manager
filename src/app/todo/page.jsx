@@ -11,6 +11,7 @@ import { useContext } from "react";
 import { useRouter } from "next/navigation";
 import TodoCreator from "@/assets/todoCreator";
 import config from "@/config";
+import UserProfileMenu from "@/assets/userProfile";
 
 function Todo() {
   const [todo, setTodo] = useState({
@@ -28,11 +29,11 @@ function Todo() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!jwt) {
+    if (!userDetails.userLoggedin) {
       router.push("/");
     }
     getTodo(jwt);
-  }, [jwt, router]);
+  }, [jwt]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -109,10 +110,7 @@ function Todo() {
   };
 
   const updateTodo = async () => {
-    if (!todo.title) return;
-
-    console.log(todo.due_on)
-  
+    if (!todo.title) return;  
     const updatedTodo = {
       ...todo,
       due_on: new Date(todo.due_on).toISOString(),
@@ -169,6 +167,7 @@ function Todo() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <UserProfileMenu/>
       <div className="container mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-center">My Todo List</h1>
 
